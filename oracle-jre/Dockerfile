@@ -16,4 +16,4 @@ COPY ["required", "/tmp"]
 
 RUN chmod +x /tmp/setup.sh && /tmp/setup.sh
 
-ENV JAVA_HOME=${JAVA_HOME} PATH="${PATH}:${JAVA_HOME}/bin"
+ENV JAVA_HOME="${JAVA_HOME}" PATH="${PATH}:${JAVA_HOME}/bin"
