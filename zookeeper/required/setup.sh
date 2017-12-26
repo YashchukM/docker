@@ -19,14 +19,9 @@ chmod +x /tmp/entrypoint.sh
 mv /tmp/conf/* "${ZK_HOME}"/conf
 mv /tmp/entrypoint.sh "${ZK_HOME}"
 
-# Configure ownership
+# Configure ZK folders
 mkdir -p /data/zookeeper
 mkdir -p /logs/zookeeper
-
-useradd -U zookeeper -d "${ZK_HOME}"
-chown -RL zookeeper:zookeeper "${ZK_HOME}"
-chown -R zookeeper:zookeeper /data/zookeeper
-chown -R zookeeper:zookeeper /logs/zookeeper
 
 # Clean
 rm -f "${ZK_ARTIFACT_PATH}"

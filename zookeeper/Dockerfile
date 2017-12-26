@@ -12,5 +12,4 @@ RUN chmod +x /tmp/setup.sh && /tmp/setup.sh
 EXPOSE 2181 2888 3888
 VOLUME ["/data/zookeeper", "/logs/zookeeper"]
 ENV ZK_HOME="${ZK_HOME}"
-USER zookeeper
 ENTRYPOINT ["/opt/zookeeper/entrypoint.sh"]
