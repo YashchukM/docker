@@ -5,7 +5,7 @@ docker build https://github.com/YashchukM/docker.git#master:zookeeper -t zookeep
 docker tag zookeeper:3.4.11 myashchuk/zookeeper:3.4.11
 
 - Run:
-ZK_CLUSTER="host:port,host:port" ZK_LOCAL_HOST="local.host.ip" \
+ZK_CLUSTER="host:port,host:port" && ZK_LOCAL_HOST="local.host.ip" && \
 docker run \
     --user "$UID" \
     --env ZK_CLUSTER="$ZK_CLUSTER" \
