@@ -1,8 +1,17 @@
 #!/bin/bash
 set -uex
 
+if [ -z ${ZK_RUN_UID} ]; then echo "Error. Need to set ZK_RUN_UID environment variable"; exit 1; fi
 if [ -z ${ZK_CLUSTER} ]; then echo "Error. Need to set ZK_CLUSTER environment variable"; exit 1; fi
 if [ -z ${ZK_LOCAL_HOST} ]; then echo "Error. Need to set ZK_LOCAL_HOST environment variable"; exit 1; fi
+
+ZK_RUN_GID=${ZK_RUN_GID:-$ZK_RUN_UID}
+groupadd --gid $ZK_RUN_GID zookeeper
+
+useradd --uid $ZK_RUN_UID --gid $ZK_RUN_GID zookeeper
+chown -RL $ZK_RUN_UID:$ZK_RUN_GID "${ZK_HOME}"
+chown -R $ZK_RUN_UID:$ZK_RUN_GID /data/zookeeper
+chown -R $ZK_RUN_UID:$ZK_RUN_GID /logs/zookeeper
 
 if [ ! -f "${ZK_HOME}"/.configured ]; then
     touch "${ZK_HOME}"/.configured
@@ -23,4 +32,4 @@ if [ ! -f "${ZK_HOME}"/.configured ]; then
     done
 fi
 
-"${ZK_HOME}"/bin/zkServer.sh start
+runuser -u zookeeper "${ZK_HOME}"/bin/zkServer.sh start-foreground
