@@ -9,12 +9,12 @@ ZK_RUN_GID=${ZK_RUN_GID:-$ZK_RUN_UID}
 groupadd --gid $ZK_RUN_GID zookeeper
 
 useradd --uid $ZK_RUN_UID --gid $ZK_RUN_GID zookeeper
-chown -RL $ZK_RUN_UID:$ZK_RUN_GID "${ZK_HOME}"
+chown -RL $ZK_RUN_UID:$ZK_RUN_GID /opt/zookeeper
 chown -R $ZK_RUN_UID:$ZK_RUN_GID /data/zookeeper
 chown -R $ZK_RUN_UID:$ZK_RUN_GID /logs/zookeeper
 
-if [ ! -f "${ZK_HOME}"/.configured ]; then
-    touch "${ZK_HOME}"/.configured
+if [ ! -f /opt/zookeeper/.configured ]; then
+    touch /opt/zookeeper/.configured
     SERVER_ID=1
     
     # Split string into array: "a, b, c" -> ["a", "b", "c"]
@@ -23,13 +23,13 @@ if [ ! -f "${ZK_HOME}"/.configured ]; then
     do
         # Host without port: SERVER="123.123.123.123:1234", "${SERVER%%:*}" -> "123.123.123.123"
         if [ ${SERVER%%:*}=${ZK_LOCAL_HOST} ]; then
-            echo server.${SERVER_ID}=0.0.0.0:2888:3888 >> "${ZK_HOME}"/conf/zoo.cfg
+            echo server.${SERVER_ID}=0.0.0.0:2888:3888 >> /opt/zookeeper/conf/zoo.cfg
             echo ${SERVER_ID} > /data/zookeeper/myid
         else
-            echo server.${SERVER_ID}=${SERVER%%:*}:2888:3888 >> "${ZK_HOME}"/conf/zoo.cfg
+            echo server.${SERVER_ID}=${SERVER%%:*}:2888:3888 >> /opt/zookeeper/conf/zoo.cfg
         fi
         SERVER_ID=$((SERVER_ID + 1))
     done
 fi
 
-runuser -u zookeeper "${ZK_HOME}"/bin/zkServer.sh start-foreground
+runuser -u zookeeper /opt/zookeeper/bin/zkServer.sh start-foreground
