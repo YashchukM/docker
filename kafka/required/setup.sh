@@ -29,6 +29,3 @@ rm -rf /tmp/*
 
 yum remove -y -q wget zip unzip
 yum clean all
-
-wget -nv "${KAFKA_URL}" /tmp/kafka_2.11-1.0.0.tgz
-tar -xzf /tmp/kafka_2.11-1.0.0.tgz -C /opt/kafka_2.11-1.0.0 --strip-components=1

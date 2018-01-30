@@ -1,4 +1,4 @@
-FROM myashchuk/zookeeper:3.4.11
+FROM myashchuk/oracle-jre:1.8
 
 ARG SCALA_VERSION=2.11
 ARG KAFKA_VERSION=1.0.0

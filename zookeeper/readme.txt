@@ -8,13 +8,11 @@ docker tag zookeeper:3.4.11 myashchuk/zookeeper:3.4.11
 docker push myashchuk/zookeeper:3.4.11
 
 - Run:
-ZK_RUN_UID=$UID && ZK_RUN_GID=$(id $(whoami) -g) && \
-ZK_CLUSTER="host:port,host:port" && ZK_LOCAL_HOST="local.host.ip" && \
 docker run \
-    --env ZK_CLUSTER="$ZK_CLUSTER" \
-    --env ZK_LOCAL_HOST="$ZK_LOCAL_HOST" \
-    --env ZK_RUN_UID="$ZK_RUN_UID" \
-    --env ZK_RUN_GID="$ZK_RUN_GID" \
+    --env ZK_CLUSTER="host:port,host:port" \
+    --env ZK_LOCAL_HOST="local.host.ip" \
+    --env ZK_RUN_UID="$UID" \
+    --env ZK_RUN_GID="$(id $(whoami) -g)" \
     --volume /data/zookeeper:/data/zookeeper \
     --volume /logs/zookeeper:/logs/zookeeper \
     --publish 2181:2181 \
