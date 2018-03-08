@@ -22,7 +22,7 @@ if [ ! -f /opt/zookeeper/.configured ]; then
     for SERVER in ${HOSTS[@]}
     do
         # Host without port: SERVER="123.123.123.123:1234", "${SERVER%%:*}" -> "123.123.123.123"
-        if [ ${SERVER%%:*}=${ZK_LOCAL_HOST} ]; then
+        if [ ${SERVER%%:*} == ${ZK_LOCAL_HOST} ]; then
             echo server.${SERVER_ID}=0.0.0.0:2888:3888 >> /opt/zookeeper/conf/zoo.cfg
             echo ${SERVER_ID} > /data/zookeeper/myid
         else
