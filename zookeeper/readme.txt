@@ -12,7 +12,8 @@ docker run \
     --env ZK_CLUSTER="host:port,host:port" \
     --env ZK_LOCAL_HOST="local.host.ip" \
     --env ZK_RUN_UID="$UID" \
-    --env ZK_RUN_GID="$(id $(whoami) -g)" \
+    --env ZK_RUN_GID="$(id $(whoami) -g)" \     # Optional
+    --env ZK_HEAP_OPTS="-Xms512m -Xmx512m" \    # Optional
     --volume /data/zookeeper:/data/zookeeper \
     --volume /logs/zookeeper:/logs/zookeeper \
     --publish 2181:2181 \
