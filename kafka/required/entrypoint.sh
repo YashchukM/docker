@@ -1,19 +1,53 @@
 #!/bin/bash
 set -uex
 
-if [ -z ${KAFKA_RUN_UID} ]; then echo "Error. Need to set KAFKA_RUN_UID environment variable"; exit 1; fi
-if [ -z ${ZK_CLUSTER} ]; then echo "Error. Need to set ZK_CLUSTER environment variable"; exit 1; fi
-if [ -z ${KAFKA_ID} ]; then echo "Error. Need to set KAFKA_ID environment variable"; exit 1; fi
+# Additional functions
+function check_env {
+    env_name=$1
+    if [ -z ${!env_name} ]; then 
+        echo "Error. Need to set $env_name environment variable"
+        exit 1
+    fi
+}
 
-# TODO: Potentially can be run with different uids
+function check_gid {
+    name=$1; gid=$2
+    if id -g $name > /dev/null 2>&1; then
+        echo "Group $name already exists, gid: $gid"
+    else
+        groupadd --gid $gid $name
+    fi
+}
+
+function check_uid {
+    name=$1; uid=$2; gid=$3
+    if id -u $name > /dev/null 2>&1; then
+        echo "User $name already exists, uid: $uid"
+    else
+        useradd --uid $uid --gid $gid $name
+    fi
+}
+
+# Input checks
+check_env KAFKA_RUN_UID
+check_env ZK_CLUSTER
+check_env KAFKA_ID
+
+# UID/GID magic to start container with internal uid\gid same as external.
+# By internal I mean uid\gid in docker container.
+# By external I mean uid\gid of user, starting this container.
+# That helps to run container not as a superuser (in the end), while still being 
+# able to write logs into appropriate folders with ownership of external user.
 KAFKA_RUN_GID=${KAFKA_RUN_GID:-$KAFKA_RUN_UID}
-groupadd --gid $KAFKA_RUN_GID kafka
+check_gid kafka $KAFKA_RUN_GID
+check_uid kafka $KAFKA_RUN_UID $KAFKA_RUN_GID
 
-useradd --uid $KAFKA_RUN_UID --gid $KAFKA_RUN_GID kafka
+# Utility folders
 chown -RL $KAFKA_RUN_UID:$KAFKA_RUN_GID /opt/kafka
 chown -R $KAFKA_RUN_UID:$KAFKA_RUN_GID /data/kafka
 chown -R $KAFKA_RUN_UID:$KAFKA_RUN_GID /logs/kafka
 
+# Configure kafka if not yet configured
 if [ ! -f /opt/kafka/.configured ]; then
     touch /opt/kafka/.configured
     echo "broker.id=${KAFKA_ID}" >> /opt/kafka/config/server.properties
@@ -24,4 +58,5 @@ if [ ! -f /opt/kafka/.configured ]; then
     fi
 fi
 
+# Run as a kafka inside container
 runuser -u kafka /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties

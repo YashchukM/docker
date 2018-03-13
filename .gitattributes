@@ -1,0 +1,9 @@
+# LF line endings for all text files
+* text eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.jks binary
+*.jar binary
+*.ttf binary

@@ -42,6 +42,11 @@ ZK_RUN_GID=${ZK_RUN_GID:-$ZK_RUN_UID}
 check_gid zookeeper $ZK_RUN_GID
 check_uid zookeeper $ZK_RUN_UID $ZK_RUN_GID
 
+# Utility folders
+chown -RL $ZK_RUN_UID:$ZK_RUN_GID /opt/zookeeper
+chown -R $ZK_RUN_UID:$ZK_RUN_GID /data/zookeeper
+chown -R $ZK_RUN_UID:$ZK_RUN_GID /logs/zookeeper
+
 # Configure zookeeper if not yet configured
 if [ ! -f /opt/zookeeper/.configured ]; then
     touch /opt/zookeeper/.configured
