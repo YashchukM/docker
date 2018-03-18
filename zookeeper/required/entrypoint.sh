@@ -28,6 +28,25 @@ function check_uid {
     fi
 }
 
+function set_value {
+    key=$1; value=$2; filepath=$3
+    if [ ! -z $key ] && [ ! -z $value ] && [ ! -z $filepath ]; then
+        esc_key=$(echo $key | sed 's/\./\\./g') # Escape dots for regex to work correctly
+        def_pattern="^$esc_key=.*$"
+        com_pattern="^# *$esc_key=.*$"
+        if grep -E "$def_pattern" $filepath >/dev/null 2>&1; then
+            sed -r -e "s~$def_pattern~$key=$value~" $filepath -i
+            echo "Property: \"$key\", new value: \"$value\", default changed"; return 0
+        elif grep -E "$com_pattern" $filepath >/dev/null 2>&1; then
+            sed -r -e "s~$com_pattern~$key=$value~" $filepath -i
+            echo "Property: \"$key\", new value: \"$value\", uncommented, default changed"; return 0
+        else
+            echo "$key=$value" >> $filepath
+            echo "Property: \"$key\", new value: \"$value\", not found, added"
+        fi
+    fi
+}
+
 # Input checks
 check_env ZK_RUN_UID
 check_env ZK_CLUSTER
@@ -58,10 +77,10 @@ if [ ! -f /opt/zookeeper/.configured ]; then
     do
         # Host without port: SERVER="123.123.123.123:1234", "${SERVER%%:*}" -> "123.123.123.123"
         if [ ${SERVER%%:*} == ${ZK_LOCAL_HOST} ]; then
-            echo server.${SERVER_ID}=0.0.0.0:2888:3888 >> /opt/zookeeper/conf/zoo.cfg
+            set_value "server.$SERVER_ID" "0.0.0.0:2888:3888" /opt/zookeeper/conf/zoo.cfg
             echo ${SERVER_ID} > /data/zookeeper/myid
         else
-            echo server.${SERVER_ID}=${SERVER%%:*}:2888:3888 >> /opt/zookeeper/conf/zoo.cfg
+            set_value "server.$SERVER_ID" "${SERVER%%:*}:2888:3888" /opt/zookeeper/conf/zoo.cfg
         fi
         SERVER_ID=$((SERVER_ID + 1))
     done
